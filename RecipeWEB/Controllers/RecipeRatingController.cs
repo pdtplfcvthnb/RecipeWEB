@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using RecipeWEB.Contracts.RecipeRating;
 using RecipeWEB.Models;
 
 namespace RecipeWEB.Controllers
 {
+
     [Route("api/[controller]")]
     [ApiController]
     public class RecipeRatingController : ControllerBase
@@ -34,19 +36,36 @@ namespace RecipeWEB.Controllers
         }
 
         [HttpPost]
-        public IActionResult Add(RecipeRating recipeRating)
+        public IActionResult Add(CreateRecipeRatingContract recipeRating)
         {
-            Context.RecipeRatings.Add(recipeRating);
+            var recipeRating1 = new RecipeRating()
+            {
+                RecipeId = recipeRating.RecipeId,
+                UserId = recipeRating.UserId,
+                Rating = recipeRating.Rating,
+                Review = recipeRating.Review,
+                RatingDate = recipeRating.RatingDate,
+            };
+            Context.RecipeRatings.Add(recipeRating1);
             Context.SaveChanges();
-            return Ok(recipeRating);
+            return Ok(recipeRating1);
         }
 
         [HttpPut]
-        public IActionResult Update(RecipeRating recipeRating)
+        public IActionResult Update(UpdateRecipeRatingContract recipeRating)
         {
-            Context.RecipeRatings.Add(recipeRating);
+            RecipeRating? recipeRatingforUp = Context.RecipeRatings.Where(x => x.RatingId == recipeRating.RatingId).FirstOrDefault();
+            if (recipeRatingforUp == null)
+            {
+                return BadRequest("Not Found");
+            }
+            recipeRatingforUp.RatingId = recipeRating.RatingId;
+            recipeRatingforUp.RatingId = recipeRating.UserId; 
+            recipeRatingforUp.Rating = recipeRating.Rating;
+            recipeRatingforUp.Review = recipeRating.Review;
+            recipeRatingforUp.RatingDate = recipeRating.RatingDate;
             Context.SaveChanges();
-            return Ok(recipeRating);
+            return Ok(recipeRatingforUp);
         }
 
         [HttpDelete]

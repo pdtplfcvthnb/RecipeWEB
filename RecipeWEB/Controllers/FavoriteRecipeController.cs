@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using RecipeWEB.Contracts.FavoriteRecipe;
 using RecipeWEB.Models;
 
 namespace RecipeWEB.Controllers
@@ -34,19 +35,29 @@ namespace RecipeWEB.Controllers
         }
 
         [HttpPost]
-        public IActionResult Add(FavoriteRecipe favoriteRecipe)
+        public IActionResult Add(CreateFavoriteRecipeContract favoriteRecipe)
         {
-            Context.FavoriteRecipes.Add(favoriteRecipe);
+            var favoriteRecipe1 = new FavoriteRecipe()
+            {
+                RecipeId = favoriteRecipe.RecipeId,
+            };
+            Context.FavoriteRecipes.Add(favoriteRecipe1);
             Context.SaveChanges();
             return Ok(favoriteRecipe);
         }
 
         [HttpPut]
-        public IActionResult Update(FavoriteRecipe favoriteRecipe)
+        public IActionResult Update(UpdateFavoriteRecipeContract favoriteRecipe)
         {
-            Context.FavoriteRecipes.Add(favoriteRecipe);
+            FavoriteRecipe? favoriteRecipeforUp = Context.FavoriteRecipes.Where(x => x.FavoriteRecipeId == favoriteRecipe.FavoriteRecipeId).FirstOrDefault();
+            if (favoriteRecipeforUp == null)
+            {
+                return BadRequest("Not Found");
+            }
+            favoriteRecipeforUp.UserId = favoriteRecipe.UserId;
+            favoriteRecipeforUp.RecipeId = favoriteRecipe.RecipeId;
             Context.SaveChanges();
-            return Ok(favoriteRecipe);
+            return Ok(favoriteRecipeforUp);
         }
 
         [HttpDelete]

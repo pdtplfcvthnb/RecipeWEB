@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using RecipeWEB.Contracts.Users;
 using RecipeWEB.Models;
 
 namespace RecipeWEB.Controllers
@@ -34,19 +35,36 @@ namespace RecipeWEB.Controllers
         }
 
         [HttpPost]
-        public IActionResult Add(User user)
+        public IActionResult Add(CreateUserContract user)
         {
-            Context.Users.Add(user);
-            Context.SaveChanges();  //
-            return Ok(user);
-        }
-
-        [HttpPut]
-        public IActionResult Update(User user)
-        {
-            Context.Users.Add(user);
+            var user1 = new User()
+            {
+                Username = user.Username,
+                Email = user.Email,
+                Password = user.Password,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                RegistrationDate = user.RegistrationDate,
+            };
+            Context.Users.Add(user1);
             Context.SaveChanges();
-            return Ok(user);
+            return Ok(user1);
+        }
+        [HttpPut]
+        public IActionResult Update(UpdateUserContract user)
+        {
+            User? userforUp = Context.Users.Where(x => x.UserId == user.UserId).FirstOrDefault();
+            if (userforUp == null)
+            {
+                return BadRequest("Not Found");
+            }
+            userforUp.Username = user.Username;
+            userforUp.Email = user.Email;
+            userforUp.Password = user.Password;
+            userforUp.FirstName = user.FirstName;
+            userforUp.LastName = user.LastName;
+            Context.SaveChanges();
+            return Ok(userforUp);
         }
 
         [HttpDelete]

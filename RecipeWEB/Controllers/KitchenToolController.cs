@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using RecipeWEB.Contracts.KitchenTool;
 using RecipeWEB.Models;
 
 namespace RecipeWEB.Controllers
@@ -34,19 +35,28 @@ namespace RecipeWEB.Controllers
         }
 
         [HttpPost]
-        public IActionResult Add(KitchenTool kitchenTool)
+        public IActionResult Add(CreateKitchenToolContract kitchenTool)
         {
-            Context.KitchenTools.Add(kitchenTool);
+            var kitchenTool1 = new KitchenTool()
+            {
+                Name = kitchenTool.Name,
+            };
+            Context.KitchenTools.Add(kitchenTool1);
             Context.SaveChanges();
             return Ok(kitchenTool);
         }
 
         [HttpPut]
-        public IActionResult Update(KitchenTool kitchenTool)
+        public IActionResult Update(UpdateKitchenToolContract kitchenTool)
         {
-            Context.KitchenTools.Add(kitchenTool);
+            KitchenTool? kitchenToolforUp = Context.KitchenTools.Where(x => x.ToolId == kitchenTool.ToolId).FirstOrDefault();
+            if (kitchenToolforUp == null)
+            {
+                return BadRequest("Not Found");
+            }
+            kitchenToolforUp.Name = kitchenTool.Name;
             Context.SaveChanges();
-            return Ok(kitchenTool);
+            return Ok(kitchenToolforUp);
         }
 
         [HttpDelete]

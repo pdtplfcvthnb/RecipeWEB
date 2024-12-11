@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using RecipeWEB.Contracts.RecipeComment;
 using RecipeWEB.Models;
 
 namespace RecipeWEB.Controllers
@@ -34,19 +35,34 @@ namespace RecipeWEB.Controllers
         }
 
         [HttpPost]
-        public IActionResult Add(RecipeComment recipeComment)
+        public IActionResult Add(CreateRecipeCommentContract recipeComment)
         {
-            Context.RecipeComments.Add(recipeComment);
+            var recipeComment1 = new RecipeComment()
+            {
+                RecipeId = recipeComment.RecipeId,
+                UserId = recipeComment.UserId,
+                Comment = recipeComment.Comment,
+                CommentDate  = recipeComment.CommentDate,
+            };
+            Context.RecipeComments.Add(recipeComment1);
             Context.SaveChanges();
-            return Ok(recipeComment);
+            return Ok(recipeComment1);
         }
 
         [HttpPut]
-        public IActionResult Update(RecipeComment recipeComment)
+        public IActionResult Update(UpdateRecipeCommentContract recipeComment)
         {
-            Context.RecipeComments.Add(recipeComment);
+            RecipeComment? recipeCommentforUp = Context.RecipeComments.Where(x => x.CommentId == recipeComment.CommentId).FirstOrDefault();
+            if (recipeCommentforUp == null)
+            {
+                return BadRequest("Not Found");
+            }
+            recipeCommentforUp.RecipeId = recipeComment.RecipeId;
+            recipeCommentforUp.UserId = recipeComment.UserId;
+            recipeCommentforUp.Comment = recipeComment.Comment;
+            recipeCommentforUp.CommentDate = recipeComment.CommentDate; 
             Context.SaveChanges();
-            return Ok(recipeComment);
+            return Ok(recipeCommentforUp);
         }
 
         [HttpDelete]

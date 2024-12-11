@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using RecipeWEB.Contracts.Alergens;
 using RecipeWEB.Models;
 
 namespace RecipeWEB.Controllers
@@ -34,19 +35,28 @@ namespace RecipeWEB.Controllers
         }
 
         [HttpPost]
-        public IActionResult Add(Allergen allergen)
+        public IActionResult Add(CreateAllergenContract allergen)
         {
-            Context.Allergens.Add(allergen);
+            var allergen1 = new Allergen()
+            {
+                Name = allergen.Name,
+            };
+            Context.Allergens.Add(allergen1);
             Context.SaveChanges();  
-            return Ok(allergen);
+            return Ok(allergen1);
         }
 
         [HttpPut]
-        public IActionResult Update(Allergen allergen)
+        public IActionResult Update(CreateAllergenContract allergen)
         {
-            Context.Allergens.Add(allergen);
+            Allergen? allergenforUp = Context.Allergens.Where(x => x.AllergenId == allergen.AllergenId).FirstOrDefault();
+            if (allergenforUp == null)
+            {
+                return BadRequest("Not Found");
+            }
+            allergenforUp.Name = allergen.Name;
             Context.SaveChanges();
-            return Ok(allergen);
+            return Ok(allergenforUp);
         }
 
         [HttpDelete]

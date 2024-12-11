@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using RecipeWEB.Contracts.Diet;
 using RecipeWEB.Models;
 
 namespace RecipeWEB.Controllers
@@ -34,19 +35,28 @@ namespace RecipeWEB.Controllers
         }
 
         [HttpPost]
-        public IActionResult Add(Diet diet)
+        public IActionResult Add(CreateDietContract diet)
         {
-            Context.Diets.Add(diet);
+            var diet1 = new Diet()
+            {
+                Name = diet.Name,
+            };
+            Context.Diets.Add(diet1);
             Context.SaveChanges();
-            return Ok(diet);
+            return Ok(diet1);
         }
 
         [HttpPut]
-        public IActionResult Update(Diet diet)
+        public IActionResult Update(UpdateDietContract diet)
         {
-            Context.Diets.Add(diet);
+            Diet? dietforUp = Context.Diets.Where(x => x.DietId == diet.DietId).FirstOrDefault();
+            if (dietforUp == null)
+            {
+                return BadRequest("Not Found");
+            }
+            dietforUp.Name = diet.Name;
             Context.SaveChanges();
-            return Ok(diet);
+            return Ok(dietforUp);
         }
 
         [HttpDelete]
